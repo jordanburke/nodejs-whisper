@@ -47,21 +47,21 @@ export default async function autoDownloadModel(
 		shell.cd('../')
 
 		let compileCommand
-        if (process.platform === 'win32') {
-            // Try mingw32-make first
-            if (shell.which('mingw32-make')) {
-                compileCommand = withCuda ? 'WHISPER_CUDA=1 mingw32-make -j' : 'mingw32-make -j'
-            } else if (shell.which('make')) {
-                compileCommand = withCuda ? 'WHISPER_CUDA=1 make -j' : 'make -j'
-            } else {
-                throw new Error('[Nodejs-whisper] Neither mingw32-make nor make found. Please install MinGW-w64 or MSYS2.')
-            }
-        } else {
-            compileCommand = withCuda ? 'WHISPER_CUDA=1 make -j' : 'make -j'
-        }
+		if (process.platform === 'win32') {
+			if (shell.which('mingw32-make')) {
+				compileCommand = withCuda ? 'WHISPER_CUDA=1 mingw32-make -j' : 'mingw32-make -j'
+			} else if (shell.which('make')) {
+				compileCommand = withCuda ? 'WHISPER_CUDA=1 make -j' : 'make -j'
+			} else {
+				throw new Error('[Nodejs-whisper] Neither mingw32-make nor make found.')
+			}
+		} else if (process.platform === 'darwin') {
+			compileCommand = `CXXFLAGS='-isystem /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1' ${withCuda ? 'WHISPER_CUDA=1' : ''} make -j`
+		} else {
+			compileCommand = withCuda ? 'WHISPER_CUDA=1 make -j' : 'make -j'
+		}
 
-        const compileResult = shell.exec(compileCommand)
-
+		const compileResult = shell.exec(compileCommand)
 
 		if (compileResult.code !== 0) {
 			throw new Error(`[Nodejs-whisper] Failed to compile model: ${compileResult.stderr}`)
