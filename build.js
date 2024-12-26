@@ -18,4 +18,9 @@ const platformConfigs = {
 
 const config = platformConfigs[platform()] || platformConfigs.linux
 
-execSync(`export CXXFLAGS='${config.cxxflags}' && cd cpp/whisper.cpp && cmake -B build && cmake --build build -j && cp build/bin/${config.binary} main`, {stdio: 'inherit'})
+const cmd = `cd cpp/whisper.cpp && cmake -DCMAKE_CXX_FLAGS="${config.cxxflags}" -B build && cmake --build build --config Release && cp build/bin/${config.binary} main`
+
+execSync(cmd, {
+    stdio: 'inherit',
+    env: { ...process.env, CXXFLAGS: config.cxxflags }
+})

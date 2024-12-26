@@ -34,7 +34,7 @@ importers:
         specifier: ^10.8.2
         version: 10.9.2(@types/node@22.10.2)(typescript@5.7.2)
       typescript:
-        specifier: ^5.1.6
+        specifier: ^5.7.2
         version: 5.7.2
 
 packages:
