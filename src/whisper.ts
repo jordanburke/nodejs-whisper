@@ -61,18 +61,16 @@ export async function executeCppCommand(command: string, logger = console, withC
 
 		if (!fs.existsSync(mainPath)) {
 			logger.debug('[Nodejs-whisper] whisper.cpp not initialized.')
-			const makeCommand = withCuda ? 'WHISPER_CUDA=1 make -j' : 'make -j'
-			shell.exec(makeCommand)
+			const buildCmd = `cmake -B build && cmake --build build --config Release && cp build/bin/whisper-cli ${mainPath}`
+			shell.exec(buildCmd)
 
-			const buildBinPath = path.join(WHISPER_CPP_PATH, 'build', 'bin', 'whisper-cli')
-			if (!fs.existsSync(buildBinPath)) {
+			if (!fs.existsSync(mainPath)) {
 				throw new Error('[Nodejs-whisper] Build failed - whisper-cli not found')
 			}
-			shell.cp(buildBinPath, mainPath)
 		}
 		return await whisperShell(command, defaultShellOptions, logger)
 	} catch (error) {
 		handleError(error as Error)
-		throw new Error('Failed to execute C++ command')
+		throw error
 	}
 }
