@@ -67,6 +67,11 @@ export default async function autoDownloadModel(
 			throw new Error(`[Nodejs-whisper] Failed to compile model: ${compileResult.stderr}`)
 		}
 
+		if (compileResult.code === 0) {
+			// Copy whisper-cli to main
+			shell.cp('build/bin/whisper-cli', 'main');
+		}
+
 		return 'Model downloaded and compiled successfully'
 	} catch (error) {
 		logger.error('[Nodejs-whisper] Error caught in autoDownloadModel:', error)
